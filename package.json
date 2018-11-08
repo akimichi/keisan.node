@@ -1,0 +1,32 @@
+{
+  "name": "keisan.node",
+  "version": "0.1.0",
+  "description": "keisan.node",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akimichi/keisan.node.git"
+  },
+  "keywords": [
+    "node.js",
+    "cli",
+    "monad"
+  ],
+  "author": "Akimichi Tatsukawa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/akimichi/keisan.node/issues"
+  },
+  "homepage": "https://github.com/akimichi/keisan.node#readme",
+  "dependencies": {
+    "expect": "23.6.0",
+    "hyouka.js": "0.4.0",
+    "kansuu.js": "0.3.1"
+  },
+  "devDependencies": {
+    "mocha": "5.2.0"
+  }
+}
