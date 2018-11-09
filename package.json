@@ -4,7 +4,8 @@
   "description": "keisan.node",
   "main": "app.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha -R spec --recursive test/",
+    "calc": "bin/calc.js"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,7 @@
   "homepage": "https://github.com/akimichi/keisan.node#readme",
   "dependencies": {
     "expect.js": "0.3.1",
-    "hyouka.js": "0.4.1",
+    "hyouka.js": "0.5.0",
     "kansuu.js": "0.3.1"
   },
   "devDependencies": {
