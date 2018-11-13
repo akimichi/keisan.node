@@ -24,7 +24,7 @@
   "homepage": "https://github.com/akimichi/keisan.node#readme",
   "dependencies": {
     "expect.js": "0.3.1",
-    "hyouka.js": "0.5.0",
+    "hyouka.js": "0.6.0",
     "kansuu.js": "0.3.1"
   },
   "devDependencies": {
