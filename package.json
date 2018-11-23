@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha -R spec --recursive test/",
-    "calc": "bin/calc.js"
+    "calc": "rlwrap bin/calc.js",
+    "date": "rlwrap bin/date.js"
   },
   "repository": {
     "type": "git",
@@ -24,8 +25,9 @@
   "homepage": "https://github.com/akimichi/keisan.node#readme",
   "dependencies": {
     "expect.js": "0.3.1",
-    "hyouka.js": "0.6.0",
-    "kansuu.js": "0.3.1"
+    "hyouka.js": "0.6.8",
+    "kansuu.js": "0.3.1",
+    "moment": "2.22.2"
   },
   "devDependencies": {
     "mocha": "5.2.0"
