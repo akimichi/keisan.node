@@ -13,10 +13,11 @@ const Hyouka = require('hyouka.js'),
   Maybe = Monad.Maybe,
   Parser = Monad.Parser;
 
+const Syntax = require("../../lib/syntax.js"),
+  Exp = require("../../lib/exp.js");
+
 // ### Syntaxのテスト
 describe("Syntaxをテストする",() => {
-  const Syntax = require("../../lib/syntax.js"),
-    Exp = require("../../lib/exp.js");
 
   describe("date", () => {
     it("dateをテストする",(done) => {
@@ -43,7 +44,7 @@ describe("Syntaxをテストする",() => {
         just: (result) => {
           Exp.match(result.value, {
             duration: (instance) => {
-              expect(instance.humanize()).to.eql("14 days");
+              expect(instance.humanize()).to.be("14 days");
               done();
             }
             // duration: (number, range) => {

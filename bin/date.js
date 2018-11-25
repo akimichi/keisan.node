@@ -9,17 +9,18 @@ const Monad = Hyouka.Monad,
   IO = Monad.IO;
  
 const Env = Hyouka.Env,
-  Syntax = Hyouka.Syntax,
-  Semantics = Hyouka.Semantics,
   Interpreter = Hyouka.Interpreter;
 
 const Environment = require('../lib/environment.js'),
+  Syntax = require('../lib/syntax.js'),
+  Semantics = require('../lib/semantics.js'),
   prelude = Environment.prelude(Environment.pairs.date)(Env.prelude()),
   Repl = require('../lib/repl.js');
 
 const Exp = require('../lib/exp.js');
 
-const language = Interpreter.mkInterpreter(Syntax.expression)(Semantics.evaluate);
-IO.run(Cont.eval(Repl.run('date')(language)(prelude)))
+IO.run(Cont.eval(Repl.run('date')(prelude)))
+// const language = Interpreter.mkInterpreter(Syntax.expression)(Semantics.evaluate);
+// IO.run(Cont.eval(Repl.run('date')(language)(prelude)))
 
 
