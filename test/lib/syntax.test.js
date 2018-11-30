@@ -19,6 +19,25 @@ const Syntax = require("../../lib/syntax.js"),
 // ### Syntaxのテスト
 describe("Syntaxをテストする",() => {
 
+  describe("expr", () => {
+    it("dateをテストする",(done) => {
+      Maybe.match(Syntax.expr()("@2018-11-23"), {
+        just: (result) => {
+          Exp.match(result.value, {
+            date: (value) => {
+              expect(value.isSame("2018-11-23")).to.eql(true);
+              done();
+            }
+          })
+        },
+        nothing: (message) => {
+          expect().to.fail()
+          done();
+        }
+      });
+    })
+
+  });
   describe("date", () => {
     it("dateをテストする",(done) => {
       Maybe.match(Syntax.Date.date()("@2018-11-23"), {
@@ -47,10 +66,6 @@ describe("Syntaxをテストする",() => {
               expect(instance.humanize()).to.be("14 days");
               done();
             }
-            // duration: (number, range) => {
-            //   expect(number).to.eql(14);
-            //   done();
-            // }
           })
         },
         nothing: (message) => {
