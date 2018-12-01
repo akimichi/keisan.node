@@ -39,14 +39,13 @@ describe("Semanticsをテストする",() => {
     });
   });
   describe("演算子を評価する",() => {
-    it("add(1,2)は、Maybe.just(3)を返す",(done) => {
+    it("add(date,duration)は、Maybe.just(date)を返す",(done) => {
       const date = Exp.date(moment("2018-12-01")),
         duration = Exp.duration(moment.duration(7, 'days'));
 
       Maybe.match(Semantics.evaluate(Exp.add(date, duration))(Env.empty()),{
         just: (value) => {
-          console.log(value)
-          expect(value).to.eql(3);
+          expect(value.isSame(moment('2018-12-08'))).to.eql(true);
           done(); 
         },
         nothing: (_) => {

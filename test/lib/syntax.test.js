@@ -20,7 +20,7 @@ const Syntax = require("../../lib/syntax.js"),
 describe("Syntaxをテストする",() => {
 
   describe("expr", () => {
-    it("dateをテストする",(done) => {
+    it("dateをテストする", function(done) {
       Maybe.match(Syntax.expr()("@2018-11-23"), {
         just: (result) => {
           Exp.match(result.value, {
@@ -36,10 +36,9 @@ describe("Syntaxをテストする",() => {
         }
       });
     })
-
   });
   describe("date", () => {
-    it("dateをテストする",(done) => {
+    it("dateをテストする", function(done) {
       Maybe.match(Syntax.Date.date()("@2018-11-23"), {
         just: (result) => {
           Exp.match(result.value, {
@@ -58,12 +57,13 @@ describe("Syntaxをテストする",() => {
   });
   describe("duration", () => {
     it("durationでdayをテストする", function(done) {
-      this.timeout('5s')
+      // this.timeout('5s')
       Maybe.match(Syntax.Date.duration()("14 days"), {
         just: (result) => {
           Exp.match(result.value, {
             duration: (instance) => {
-              expect(instance.humanize()).to.be("14 days");
+              expect(instance.as('days')).to.eql(14);
+              // expect(instance.humanize()).to.eql("14 days");
               done();
             }
           })
