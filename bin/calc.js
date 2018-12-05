@@ -21,39 +21,3 @@ const Environment = require('../lib/environment.js'),
 const language = Interpreter.mkInterpreter(Syntax.expression)(Semantics.evaluate);
 IO.run(Cont.eval(Repl.run('calc')(language)(prelude)))
 
-// const repl = (environment) => {
-//   const inputAction = (prompt) => {
-//     const readlineSync = require('readline-sync');
-//     return IO.unit(readlineSync.question(prompt));
-//   };
- 
-//   return Cont.callCC(exit => {
-
-//     const loop = (env) => {
-//       return IO.flatMap(inputAction("\ncalc> "))(inputString  => {
-//         return IO.flatMap(IO.putString(inputString))(_ => {
-//           if(inputString === 'exit') {
-//             return exit(IO.done(_));
-//           } else {
-//             return Maybe.match(Cont.eval(Interpreter.eval(env)(inputString)),{
-//               nothing: (message) => {
-//                 return IO.flatMap(IO.putString(`\nnothing: ${message}`))(_ => {
-//                   return loop(env); 
-//                 });
-//               },
-//               just: (value) => {
-//                 return IO.flatMap(IO.putString(`\n${value}`))(_ => {
-//                   return loop(env); 
-//                 });
-//               }
-//             })
-//           }
-//         });
-//       });
-//     };
-
-//     return Cont.unit(loop(environment))
-//   });
-// };
- 
-// IO.run(Cont.eval(repl(prelude)))
