@@ -20,7 +20,5 @@ const Environment = require('../lib/environment.js'),
 const Exp = require('../lib/exp.js');
 
 IO.run(Cont.eval(Repl.run('date')(prelude)))
-// const language = Interpreter.mkInterpreter(Syntax.expression)(Semantics.evaluate);
-// IO.run(Cont.eval(Repl.run('date')(language)(prelude)))
 
 
