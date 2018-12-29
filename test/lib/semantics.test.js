@@ -5,7 +5,7 @@ const fs = require('fs'),
 
 const kansuu = require('kansuu.js'),
   array = kansuu.array,
-  pair = kansuu.pair;
+  Pair = kansuu.pair;
 
 const Hyouka = require('hyouka.js'),
   Monad = Hyouka.Monad,
@@ -24,16 +24,33 @@ describe("Semanticsをテストする",() => {
     Semantics = require("../../lib/semantics.js");
 
   describe("変数を評価する",() => {
-    it("evaluate(E)は、Maybe.just(文字列)を返す",(done) => {
+    it("evaluate(abc)は、Maybe.just(文字列)を返す",(done) => {
       const Environment = require("../../lib/environment.js");
-      const t = Exp.variable("E"),
-        prelude = Environment.append(Environment.pairs.calc)(Env.empty());
+      const t = Exp.variable("abc"),
+        prelude = Environment.append([Pair.cons('abc', 123)])(Env.empty());
       Maybe.match(Semantics.evaluate(t)(prelude),{
         nothing: (_) => {
           expect().fail();
         },
         just: (value) => {
-          expect(value).to.eql(Math.E);
+          expect(value).to.eql(123);
+          done(); 
+        }
+      })
+    });
+    it("evaluate(関数)は、Maybe.just(文字列)を返す",(done) => {
+      const Environment = require("../../lib/environment.js");
+      const t = Exp.variable("fun"),
+        pair = [Pair.cons('fun', ((_) => {
+          return 321;
+        })())],
+        prelude = Environment.append(pair)(Env.empty());
+      Maybe.match(Semantics.evaluate(t)(prelude),{
+        nothing: (_) => {
+          expect().fail();
+        },
+        just: (value) => {
+          expect(value).to.eql(321);
           done(); 
         }
       })
