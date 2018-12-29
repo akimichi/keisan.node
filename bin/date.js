@@ -14,7 +14,7 @@ const Env = Hyouka.Env,
 const Environment = require('../lib/environment.js'),
   Syntax = require('../lib/syntax.js'),
   Semantics = require('../lib/semantics.js'),
-  prelude = Environment.prelude(Environment.pairs.date)(Env.prelude()),
+  prelude = Environment.append(Environment.pairs.date)(Env.prelude()),
   Repl = require('../lib/repl.js');
 
 const Exp = require('../lib/exp.js');
