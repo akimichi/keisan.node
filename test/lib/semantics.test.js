@@ -17,11 +17,28 @@ const moment = require('moment');
 
 // ### Semanticsのテスト
 describe("Semanticsをテストする",() => {
-  const Env = require("../../lib/environment.js"),
+  // const Env = require("../../lib/environment.js"),
+  const Env = Hyouka.Env,
     Exp = require("../../lib/exp.js"),
     Syntax = require("../../lib/syntax.js"),
     Semantics = require("../../lib/semantics.js");
 
+  describe("変数を評価する",() => {
+    it("evaluate(E)は、Maybe.just(文字列)を返す",(done) => {
+      const Environment = require("../../lib/environment.js");
+      const t = Exp.variable("E"),
+        prelude = Environment.append(Environment.pairs.calc)(Env.empty());
+      Maybe.match(Semantics.evaluate(t)(prelude),{
+        nothing: (_) => {
+          expect().fail();
+        },
+        just: (value) => {
+          expect(value).to.eql(Math.E);
+          done(); 
+        }
+      })
+    });
+  });
   describe("値を評価する",() => {
     describe("dateを評価する",() => {
       it("evaluate(date)は、Maybe.just(文字列)を返す",(done) => {

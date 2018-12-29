@@ -6,7 +6,7 @@ const fs = require('fs'),
 
 const kansuu = require('kansuu.js'),
   array = kansuu.array,
-  pair = kansuu.pair;
+  Pair = kansuu.pair;
 
 
 // ### Environmentのテスト
@@ -25,9 +25,9 @@ describe("Environmentをテストする",() => {
   describe("Environment.preludeをテストする",() => {
     it("定数をテストする",(done) => {
       const pairs = [
-        pair.cons('E', Math.E)
+        Pair.cons('E', Math.E)
       ];
-      const prelude = Environment.prelude(pairs)(Env.empty());
+      const prelude = Environment.append(pairs)(Env.empty());
       Maybe.match(Env.lookup('E')(prelude),{
         nothing: (_) => {
           expect().fail();
