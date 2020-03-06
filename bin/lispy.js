@@ -39,7 +39,7 @@ const Semantics = Hyouka.Semantics,
 const Repl = (environment) => {
   // const Semantics = require('../lib/semantics.js');
   const Evaluator = Interpreter(Syntax.expression, Semantics.evaluator);
-  const inputAction = (prompt) => {
+  const read = (prompt) => {
     const readlineSync = require('readline-sync');
     return IO.unit(readlineSync.question(prompt));
   };
@@ -48,7 +48,7 @@ const Repl = (environment) => {
   return Cont.callCC(exit => {
     // loop:: Null -> IO
     const loop = (environment) => {
-      return IO.flatMap(inputAction("\nlispy> "))(inputString  => {
+      return IO.flatMap(read("\nlispy> "))(inputString  => {
         return IO.flatMap(IO.putString(inputString))(_ => {
           if(inputString === 'exit') {
             return exit(IO.done(_));
