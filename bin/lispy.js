@@ -31,14 +31,15 @@ const Lispy = require('../lib/lispy'),
  * 評価器
  */
 
-const Semantics = Hyouka.Semantics,
-  Interpreter = Hyouka.Interpreter;
+const Interpreter = Hyouka.Interpreter;
+// const Semantics = Hyouka.Semantics,
+//   Interpreter = Hyouka.Interpreter;
 
 //
 // repl:: Env -> Cont[IO]
 const Repl = (environment) => {
   // const Semantics = require('../lib/semantics.js');
-  const Evaluator = Interpreter(Syntax.expression, Semantics.evaluator);
+  const Evaluator = Interpreter(Lispy.Syntax.expression, Lispy.Semantics.evaluator);
   const read = (prompt) => {
     const readlineSync = require('readline-sync');
     return IO.unit(readlineSync.question(prompt));
@@ -76,30 +77,7 @@ const Repl = (environment) => {
 /* 
  * 環境 Environment
  */
-const Env = Hyouka.Env;
-
-const extraEnv = [
-  pair.cons('cons', (head) => {
-    return Maybe.just(tail => {
-      return Maybe.just(array.cons(head, tail)); 
-    });
-  }),
-  pair.cons('+', (n) => {
-    return Maybe.just(m => {
-      return Maybe.just(n + m); 
-    });
-  }),
-  pair.cons('-', (n) => {
-    return Maybe.just(m => {
-      return Maybe.just(n - m); 
-    });
-  }),
-  pair.cons('print', (message => {
-    return Maybe.just(message); 
-  }))
-];
-const environment = Env.prelude(extraEnv);
-
+const environment = Lispy.Env.prelude();
 
 IO.run(Cont.eval(Repl(environment)))
 
