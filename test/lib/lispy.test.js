@@ -10,7 +10,10 @@ const kansuu = require('kansuu.js'),
 
 const Hyouka = require('hyouka.js'),
   Exp = Hyouka.Exp,
+  Env = Hyouka.Env,
   Monad = Hyouka.Monad,
+  State = Monad.State,
+  ST = Monad.ST,
   Maybe = Monad.Maybe,
   Parser = Monad.Parser;
 
@@ -18,6 +21,25 @@ const Hyouka = require('hyouka.js'),
 
 // ### Lispyのテスト
 describe("Lispyをテストする",() => {
+  describe("Lispy.Semanticsをテストする",() => {
+    const Semantics = require("../../lib/lispy").Semantics;
+
+    describe("evaluateをテストする",() => {
+      it("evaluate(Exp.num)", function(done) {
+        const number = Exp.num(2); 
+        Maybe.match(State.eval(Semantics.evaluate(number))(Env.empty()), {
+          just: (result) => {
+            expect(result).to.eql(2)
+            done();
+          },
+          nothing: (message) => {
+            expect().to.fail()
+            done();
+          }
+        });
+      })
+    });
+  });
   describe("Lispy.Syntaxをテストする",() => {
     const Syntax = require("../../lib/lispy").Syntax;
 
