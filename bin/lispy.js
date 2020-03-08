@@ -32,8 +32,6 @@ const Lispy = require('../lib/lispy'),
  */
 
 const Interpreter = Hyouka.Interpreter;
-// const Semantics = Hyouka.Semantics,
-//   Interpreter = Hyouka.Interpreter;
 
 //
 // repl:: Env -> Cont[IO]
