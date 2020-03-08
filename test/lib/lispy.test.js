@@ -38,6 +38,35 @@ describe("Lispyをテストする",() => {
           }
         });
       })
+      describe("変数を評価する",() => {
+        it("evaluate(Exp.variable) で未定義の場合", function(done) {
+          const variable = Exp.variable("foo"); 
+          Maybe.match(State.eval(Semantics.evaluate(variable))(Env.empty()), {
+            just: (result) => {
+              expect().to.fail()
+              done();
+            },
+            nothing: (message) => {
+              expect(message).to.eql("変数 foo は未定義です")
+              done();
+            }
+          });
+        })
+        it("evaluate(Exp.variable) で定義済みの場合", function(done) {
+          const variable = Exp.variable("bar"); 
+          const env = Env.extend("bar", 1)(Env.empty());
+          Maybe.match(State.eval(Semantics.evaluate(variable))(env), {
+            just: (result) => {
+              expect(result).to.eql(1)
+              done();
+            },
+            nothing: (message) => {
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+      })
     });
   });
   describe("Lispy.Syntaxをテストする",() => {
