@@ -53,6 +53,21 @@ describe("Lispyをテストする",() => {
           });
         })
       })
+      describe("リストを評価する",() => {
+        it("evaluate(Exp.list)", function(done) {
+          const list = Exp.list([1,2]); 
+          Maybe.match(State.eval(Semantics.evaluate(list))(Env.empty()), {
+            just: (result) => {
+              expect(result).to.eql(true)
+              done();
+            },
+            nothing: (message) => {
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+      })
       describe("変数を評価する",() => {
         it("evaluate(Exp.variable) で未定義の場合", function(done) {
           const variable = Exp.variable("foo"); 
