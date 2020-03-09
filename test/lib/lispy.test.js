@@ -38,6 +38,21 @@ describe("Lispyをテストする",() => {
           }
         });
       })
+      describe("真理値を評価する",() => {
+        it("evaluate(Exp.bool)", function(done) {
+          const bool = Exp.bool(true); 
+          Maybe.match(State.eval(Semantics.evaluate(bool))(Env.empty()), {
+            just: (result) => {
+              expect(result).to.eql(true)
+              done();
+            },
+            nothing: (message) => {
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+      })
       describe("変数を評価する",() => {
         it("evaluate(Exp.variable) で未定義の場合", function(done) {
           const variable = Exp.variable("foo"); 

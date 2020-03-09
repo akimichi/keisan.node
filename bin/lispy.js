@@ -31,13 +31,15 @@ const Lispy = require('../lib/lispy'),
  * 評価器
  */
 
-const Interpreter = Hyouka.Interpreter;
+const Interpreter = Hyouka.Interpreter,
+  Semantics = Hyouka.Semantics;
 
 //
 // repl:: Env -> Cont[IO]
 const Repl = (environment) => {
   // const Semantics = require('../lib/semantics.js');
-  const Evaluator = Interpreter(Lispy.Syntax.expression, Lispy.Semantics.evaluator);
+  // const Evaluator = Interpreter(Lispy.Syntax.expression, Lispy.Semantics.evaluator);
+  const Evaluator = Interpreter(Lispy.Syntax.expression, Semantics.evaluator);
   const read = (prompt) => {
     const readlineSync = require('readline-sync');
     return IO.unit(readlineSync.question(prompt));
