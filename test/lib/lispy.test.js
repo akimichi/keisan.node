@@ -12,6 +12,7 @@ const Hyouka = require('hyouka.js'),
   Exp = Hyouka.Exp,
   Env = Hyouka.Env,
   Monad = Hyouka.Monad,
+  Cont = Monad.Cont,
   State = Monad.State,
   ST = Monad.ST,
   Maybe = Monad.Maybe,
@@ -27,7 +28,8 @@ describe("Lispyをテストする",() => {
     describe("evaluateをテストする",() => {
       it("evaluate(Exp.num)", function(done) {
         const number = Exp.num(2); 
-        Maybe.match(State.eval(Semantics.evaluate(number))(Env.empty()), {
+        Maybe.match(State.eval(Cont.eval(Semantics.evaluate(number)))(Env.empty()), {
+        // Maybe.match(Cont.eval(State.eval(Semantics.evaluate(number))(Env.empty())), {
           just: (result) => {
             expect(result).to.eql(2)
             done();
@@ -41,7 +43,8 @@ describe("Lispyをテストする",() => {
       describe("真理値を評価する",() => {
         it("evaluate(Exp.bool)", function(done) {
           const bool = Exp.bool(true); 
-          Maybe.match(State.eval(Semantics.evaluate(bool))(Env.empty()), {
+          Maybe.match(State.eval(Cont.eval(Semantics.evaluate(bool)))(Env.empty()), {
+          //Maybe.match(State.eval(Semantics.evaluate(bool))(Env.empty()), {
             just: (result) => {
               expect(result).to.eql(true)
               done();
@@ -56,7 +59,8 @@ describe("Lispyをテストする",() => {
       describe("リストを評価する",() => {
         it("evaluate(Exp.list)", function(done) {
           const list = Exp.list([Exp.num(1), Exp.num(2)]); 
-          Maybe.match(State.eval(Semantics.evaluate(list))(Env.empty()), {
+          Maybe.match(State.eval(Cont.eval(Semantics.evaluate(list)))(Env.empty()), {
+          // Maybe.match(State.eval(Semantics.evaluate(list))(Env.empty()), {
             just: (result) => {
               expect(result).to.eql([1,2])
               done();
@@ -71,7 +75,8 @@ describe("Lispyをテストする",() => {
       describe("変数を評価する",() => {
         it("evaluate(Exp.variable) で未定義の場合", function(done) {
           const variable = Exp.variable("foo"); 
-          Maybe.match(State.eval(Semantics.evaluate(variable))(Env.empty()), {
+          Maybe.match(State.eval(Cont.eval(Semantics.evaluate(variable)))(Env.empty()), {
+          // Maybe.match(State.eval(Semantics.evaluate(variable))(Env.empty()), {
             just: (result) => {
               expect().to.fail()
               done();
@@ -85,7 +90,8 @@ describe("Lispyをテストする",() => {
         it("evaluate(Exp.variable) で定義済みの場合", function(done) {
           const variable = Exp.variable("bar"); 
           const env = Env.extend("bar", 1)(Env.empty());
-          Maybe.match(State.eval(Semantics.evaluate(variable))(env), {
+          Maybe.match(State.eval(Cont.eval(Semantics.evaluate(variable)))(env), {
+          // Maybe.match(State.eval(Semantics.evaluate(variable))(env), {
             just: (result) => {
               expect(result).to.eql(1)
               done();
