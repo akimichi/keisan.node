@@ -55,10 +55,10 @@ describe("Lispyをテストする",() => {
       })
       describe("リストを評価する",() => {
         it("evaluate(Exp.list)", function(done) {
-          const list = Exp.list([1,2]); 
+          const list = Exp.list([Exp.num(1), Exp.num(2)]); 
           Maybe.match(State.eval(Semantics.evaluate(list))(Env.empty()), {
             just: (result) => {
-              expect(result).to.eql(true)
+              expect(result).to.eql([1,2])
               done();
             },
             nothing: (message) => {
