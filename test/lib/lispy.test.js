@@ -117,24 +117,51 @@ describe("Lispyをテストする",() => {
             }
           })
         });
-        // it("app(app(lambda(x, lambda(y, subtract(x,y))), two), one)",(done) => {
-        //   const one = Exp.num(1), two = Exp.num(2);
-        //   const x = Exp.variable('x'), y = Exp.variable('y'),
-        //     application = Exp.app(
-        //       Exp.app(
-        //         Exp.lambda(x, Exp.lambda(y, 
-        //           Exp.subtract(x, y)))
-        //         , two) , one);
-        //   Maybe.match(State.eval(Cont.eval(evaluator(application)))(Env.empty()),{
-        //     nothing: (_) => {
-        //       expect().fail();
-        //     },
-        //     just: (value) => {
-        //       expect(value).to.eql(1);
-        //       done(); 
-        //     }
-        //   })
-        // });
+        it("app(app(lambda(x, lambda(y, subtract(x,y))), two), one)",(done) => {
+          const one = Exp.num(1), two = Exp.num(2);
+          const x = Exp.variable('x'), y = Exp.variable('y'),
+            application = Exp.app(
+              Exp.app(
+                Exp.lambda(x, Exp.lambda(y, 
+                  Exp.subtract(x, y)))
+                , two) , one);
+          Maybe.match(State.eval(Cont.eval(evaluator(application)))(Env.empty()),{
+            nothing: (_) => {
+              expect().fail();
+            },
+            just: (value) => {
+              expect(value).to.eql(1);
+              done(); 
+            }
+          })
+        });
+        it("app(app(lambda(x, lambda(y, multiply(x,y))), two), three)",(done) => {
+          const three = Exp.num(3), two = Exp.num(2);
+          const x = Exp.variable('x'), y = Exp.variable('y'),
+            application = Exp.app(
+              Exp.app(
+                Exp.lambda(x, Exp.lambda(y, 
+                  Exp.multiply(x, y)))
+                , two) , three);
+          //  かけ算の評価 
+          Semantics.pattern.multiply = (expL, expR) => {
+            const operator = (operandL, operandR) => {
+              return operandL * operandR; 
+            };
+            return State.state(env => {
+              return pair.cons(Semantics.binary(operator)(expL, expR)(env), env);
+            });
+          },
+          Maybe.match(State.eval(Cont.eval(evaluator(application)))(Env.empty()),{
+            nothing: (_) => {
+              expect().fail();
+            },
+            just: (value) => {
+              expect(value).to.eql(6);
+              done(); 
+            }
+          })
+        });
       })
     });
     describe("evaluateをテストする",() => {
