@@ -4,7 +4,7 @@
   "description": "keisan.node",
   "main": "app.js",
   "scripts": {
-    "test": "mocha -R spec --recursive test/",
+    "test": "npx mocha -R spec --recursive test/",
     "calc": "rlwrap node bin/calc.js",
     "date": "rlwrap node bin/date.js",
     "lispy": "rlwrap node bin/lispy.js"
