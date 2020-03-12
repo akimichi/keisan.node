@@ -26,7 +26,7 @@ describe("Lispyをテストする",() => {
     const Semantics = require("../../lib/lispy").Semantics;
 
     describe("evaluatorをテストする",() => {
-      const evaluator = Semantics.evaluator(Semantics.pattern);
+      const evaluator = Semantics.evaluator(Semantics.definition);
       it("evaluator(Exp.num)", function(done) {
         const number = Exp.num(2); 
         Maybe.match(State.eval(Cont.eval(evaluator(number)))(Env.empty()), {
@@ -144,7 +144,7 @@ describe("Lispyをテストする",() => {
                   Exp.multiply(x, y)))
                 , two) , three);
           //  かけ算の評価 
-          Semantics.pattern.multiply = (expL, expR) => {
+          Semantics.definition.multiply = (expL, expR) => {
             const operator = (operandL, operandR) => {
               return operandL * operandR; 
             };
