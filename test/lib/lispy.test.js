@@ -26,7 +26,7 @@ describe("Lispyをテストする",() => {
     const Semantics = require("../../lib/lispy").Semantics;
 
     describe("evaluatorをテストする",() => {
-      const evaluator = Semantics.evaluator(Semantics.definition);
+      const evaluator = Semantics.evaluate(Semantics.definition);
       it("evaluator(Exp.num)", function(done) {
         const number = Exp.num(2); 
         Maybe.match(State.eval(Cont.eval(evaluator(number)))(Env.empty()), {
