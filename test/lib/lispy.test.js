@@ -40,7 +40,7 @@ describe("Lispyをテストする",() => {
           }
         });
       })
-      describe("真理値を評価する",() => {
+      describe("真理値を評価する evaluate bool expression",() => {
         it("evaluator(Exp.bool)", function(done) {
           const bool = Exp.bool(true); 
           Maybe.match(State.eval(Cont.eval(evaluator(bool)))(Env.empty()), {
@@ -55,11 +55,10 @@ describe("Lispyをテストする",() => {
           });
         })
       })
-      describe("リストを評価する",() => {
+      describe("リストを評価する evaluator list expression",() => {
         it("evaluator(Exp.list)", function(done) {
           const list = Exp.list([Exp.num(1), Exp.num(2)]); 
           Maybe.match(State.eval(Cont.eval(evaluator(list)))(Env.empty()), {
-          // Maybe.match(State.eval(Semantics.evaluate(list))(Env.empty()), {
             just: (result) => {
               expect(result).to.eql([1,2])
               done();
@@ -71,7 +70,7 @@ describe("Lispyをテストする",() => {
           });
         })
       })
-      describe("変数を評価する",() => {
+      describe("変数を評価する evaluate variable expression",() => {
         it("evaluator(Exp.variable) で未定義の場合", function(done) {
           const variable = Exp.variable("foo"); 
           Maybe.match(State.eval(Cont.eval(evaluator(variable)))(Env.empty()), {
@@ -100,7 +99,7 @@ describe("Lispyをテストする",() => {
           });
         })
       })
-      describe("関数適用を評価する",() => {
+      describe("関数適用を評価する evaluator function application",() => {
         it("(x => (x + 1))(1)",(done) => {
           const x = Exp.variable('x'), one = Exp.num(1);
           const application = Exp.app(
@@ -163,85 +162,21 @@ describe("Lispyをテストする",() => {
           })
         });
       })
-    });
-    describe("evaluateをテストする",() => {
-      // it("evaluate(Exp.num)", function(done) {
-      //   const number = Exp.num(2); 
-      //   Maybe.match(State.eval(Cont.eval(Semantics.evaluate(number)))(Env.empty()), {
-      //   // Maybe.match(Cont.eval(State.eval(Semantics.evaluate(number))(Env.empty())), {
-      //     just: (result) => {
-      //       expect(result).to.eql(2)
-      //       done();
-      //     },
-      //     nothing: (message) => {
-      //       expect().to.fail()
-      //       done();
-      //     }
-      //   });
-      // })
-      //describe("真理値を評価する",() => {
-      //  it("evaluate(Exp.bool)", function(done) {
-      //    const bool = Exp.bool(true); 
-      //    Maybe.match(State.eval(Cont.eval(Semantics.evaluate(bool)))(Env.empty()), {
-      //    //Maybe.match(State.eval(Semantics.evaluate(bool))(Env.empty()), {
-      //      just: (result) => {
-      //        expect(result).to.eql(true)
-      //        done();
-      //      },
-      //      nothing: (message) => {
-      //        expect().to.fail()
-      //        done();
-      //      }
-      //    });
-      //  })
-      //})
-      //describe("リストを評価する",() => {
-      //  it("evaluate(Exp.list)", function(done) {
-      //    const list = Exp.list([Exp.num(1), Exp.num(2)]); 
-      //    Maybe.match(State.eval(Cont.eval(Semantics.evaluate(list)))(Env.empty()), {
-      //    // Maybe.match(State.eval(Semantics.evaluate(list))(Env.empty()), {
-      //      just: (result) => {
-      //        expect(result).to.eql([1,2])
-      //        done();
-      //      },
-      //      nothing: (message) => {
-      //        expect().to.fail()
-      //        done();
-      //      }
-      //    });
-      //  })
-      //})
-      //describe("変数を評価する",() => {
-      //  it("evaluate(Exp.variable) で未定義の場合", function(done) {
-      //    const variable = Exp.variable("foo"); 
-      //    Maybe.match(State.eval(Cont.eval(Semantics.evaluate(variable)))(Env.empty()), {
-      //    // Maybe.match(State.eval(Semantics.evaluate(variable))(Env.empty()), {
-      //      just: (result) => {
-      //        expect().to.fail()
-      //        done();
-      //      },
-      //      nothing: (message) => {
-      //        expect(message).to.eql("変数 foo は未定義です")
-      //        done();
-      //      }
-      //    });
-      //  })
-      //  it("evaluate(Exp.variable) で定義済みの場合", function(done) {
-      //    const variable = Exp.variable("bar"); 
-      //    const env = Env.extend("bar", 1)(Env.empty());
-      //    Maybe.match(State.eval(Cont.eval(Semantics.evaluate(variable)))(env), {
-      //    // Maybe.match(State.eval(Semantics.evaluate(variable))(env), {
-      //      just: (result) => {
-      //        expect(result).to.eql(1)
-      //        done();
-      //      },
-      //      nothing: (message) => {
-      //        expect().to.fail()
-      //        done();
-      //      }
-      //    });
-      //  })
-      //})
+      describe("setを評価する evaluator special function 'set'",() => {
+        it("set(x, Exp.num(1))",(done) => {
+          const one = Exp.num(1), x = Exp.variable('x'),
+            set = Exp.set(x, one);
+          Maybe.match(State.eval(Cont.eval(evaluator(set)))(Env.empty()),{
+            nothing: (_) => {
+              expect().fail();
+            },
+            just: (value) => {
+              expect(value).to.eql(1);
+              done(); 
+            }
+          })
+        });
+      })
     });
   });
   describe("Lispy.Syntaxをテストする",() => {
