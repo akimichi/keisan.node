@@ -24,60 +24,89 @@ const Hyouka = require('hyouka.js'),
   IO = Monad.IO,
   ID = Monad.ID;
 
-const Lispy = require('../lib/lispy'),
-  Syntax = Lispy.Syntax;
+// const Lispy = require('../lib/lispy'),
+//   Syntax = Lispy.Syntax;
 
 /*
  * 評価器
  */
 
-const Interpreter = Hyouka.Interpreter,
-  Semantics = Hyouka.Semantics;
+// const Interpreter = Hyouka.Interpreter,
+//   Semantics = Hyouka.Semantics;
+
+// const Evaluator = (syntax, evaluator) => {
+//   return (env) => (line) => { // Cont[Maybe[Value]]
+//     return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
+//       const exp = result.value;
+//       return evaluator(exp)(env); // Cont[Maybe[Value]]
+//     })
+//   }
+// };
 
 //
-// repl:: Env -> Cont[IO]
-const Repl = (environment) => {
-  // const Semantics = require('../lib/semantics.js');
-  // const Evaluator = Interpreter(Lispy.Syntax.expression, Lispy.Semantics.evaluator);
-  const Evaluator = Interpreter(Lispy.Syntax.expression, Semantics.evaluator);
-  const read = (prompt) => {
-    const readlineSync = require('readline-sync');
-    return IO.unit(readlineSync.question(prompt));
-  };
+const read = (prompt) => {
+  const readlineSync = require('readline-sync');
+  return IO.unit(readlineSync.question(prompt));
+};
+//
+// const Evaluator = Interpreter(Lispy.Syntax.expression, Semantics.evaluator);
+const Lispy = require("../lib/lispy"),
+  Semantics = Lispy.Semantics,
+  Syntax = Lispy.Syntax;
 
+// Evaluator:: (Syntax, Definition) => String => Cont[State[Maybe[VALUE]]]
+const Evaluator = (syntax, definition) => (line) => {
+  return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
+    const exp = result.value;
+    return Semantics.evaluate(definition)(exp) // => Cont[State[Maybe[VALUE]]]
+  });
+};
+// evaluate:: String -> Cont[State[Maybe[VALUE]]]
+const evaluator = Evaluator(Syntax.expression, Semantics.definition);
 
-  return Cont.callCC(exit => {
-    // loop:: Null -> IO
-    const loop = (environment) => {
-      return IO.flatMap(read("\nlispy> "))(inputString  => {
-        return IO.flatMap(IO.putString(inputString))(_ => {
-          if(inputString === 'exit') {
-            return exit(IO.done(_));
-          } else {
-            return Maybe.match(Cont.eval(Evaluator(environment)(inputString)),{
-              nothing: (message) => {
-                return IO.flatMap(IO.putString(`\nnothing: ${message}`))(_ => {
-                  return loop(environment); 
-                });
-              },
-              just: (value) => {
-                return IO.flatMap(IO.putString(`\n${value}`))(_ => {
-                  return loop(environment); 
-                });
-              }
-            })
-          }
+// repl:: () => State[Cont[IO]]
+const Repl = () => {
+  return State.state(env => {
+    return Cont.callCC(exit => {
+
+      // loop:: () -> State[IO]
+      const loop = () => {
+        return IO.flatMap(read("\nlispy> "))(inputString  => {
+          return IO.flatMap(IO.putString(inputString))(_ => {
+            if(inputString === 'exit') {
+              return exit(IO.done(_));
+            } else {
+              const newState = Cont.eval(evaluator(inputString)).run(env),
+                maybeValue = pair.left(newState),
+                newEnv = pair.right(newState);
+
+              return Maybe.match(maybeValue,{
+                nothing: (message) => {
+                  return IO.flatMap(IO.putString(`\nnothing: ${message}`))(_ => {
+                    return loop(newState); 
+                  });
+                },
+                just: (value) => {
+                  console.log(`value: ${value}`)
+                  return IO.flatMap(IO.putString(`\n${value}`))(_ => {
+                    return loop(newState); 
+                  });
+                }
+              })
+            }
+          });
         });
-      });
-    };
-    return Cont.unit(loop(environment))
+      }; // end of loop
+      return Cont.unit(loop())
+    }); // end of Cont.callCC
   });
 };
 
 /* 
  * 環境 Environment
  */
-const environment = Lispy.Env.prelude();
+const environment = Lispy.Env.prelude(),
+  initialState = State.unit(undefined);
 
-IO.run(Cont.eval(Repl(environment)))
+IO.run(Cont.eval(Repl().run(environment)))
 
