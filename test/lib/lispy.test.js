@@ -208,6 +208,45 @@ describe("Lispyをテストする",() => {
   describe("Lispy.Syntaxをテストする",() => {
     const Syntax = require("../../lib/lispy").Syntax;
 
+    describe("specialをテストする",() => {
+      describe("setをテストする",() => {
+        it("{set x 1}はset式である", function(done) {
+          Maybe.match(Syntax.special()("{set x 1}"), {
+            just: (result) => {
+              Exp.match(result.value, {
+                set: (value) => {
+                  expect(true).to.eql(true)
+                  done();
+                }
+              })
+            },
+            nothing: (message) => {
+              console.log(message)
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+      });
+      describe("lambdaをテストする",() => {
+        it("{x x}はlambda式である", function(done) {
+          Maybe.match(Syntax.special()("{x x}"), {
+            just: (result) => {
+              Exp.match(result.value, {
+                lambda: (value) => {
+                  expect(true).to.eql(true)
+                  done();
+                }
+              })
+            },
+            nothing: (message) => {
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+      });
+    });
     describe("numberをテストする",() => {
       it("abcはnumberではない", function(done) {
         Maybe.match(Syntax.number()("abc"), {
