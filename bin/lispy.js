@@ -76,7 +76,8 @@ const Repl = () => {
             if(inputString === 'exit') {
               return exit(IO.done(_));
             } else {
-              const newState = Cont.eval(evaluator(inputString)).run(env),
+              // const newState = Cont.eval(evaluator(inputString)).run(env),
+              const newState = State.run(Cont.eval(evaluator(inputString)))(env),
                 maybeValue = pair.left(newState),
                 newEnv = pair.right(newState);
 
@@ -87,7 +88,6 @@ const Repl = () => {
                   });
                 },
                 just: (value) => {
-                  console.log(`value: ${value}`)
                   return IO.flatMap(IO.putString(`\n${value}`))(_ => {
                     return loop(newState); 
                   });
@@ -105,8 +105,7 @@ const Repl = () => {
 /* 
  * 環境 Environment
  */
-const environment = Lispy.Env.prelude(),
-  initialState = State.unit(undefined);
+const environment = Lispy.Env.prelude();
 
 IO.run(Cont.eval(Repl().run(environment)))
 

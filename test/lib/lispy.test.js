@@ -163,7 +163,7 @@ describe("Lispyをテストする",() => {
         });
       })
       describe("setを評価する evaluator special function 'set'",() => {
-        it("set(x, Exp.num(1))",(done) => {
+        it("set(x, Exp.num(1)) で値を確認する",(done) => {
           const one = Exp.num(1), x = Exp.variable('x'),
             set = Exp.set(x, one);
           Maybe.match(State.eval(Cont.eval(evaluator(set)))(Env.empty()),{
@@ -172,6 +172,32 @@ describe("Lispyをテストする",() => {
             },
             just: (value) => {
               expect(value).to.eql(1);
+              done(); 
+            }
+          })
+        });
+        it("set(x, Exp.num(1)) で状態を確認する",(done) => {
+          const one = Exp.num(1), x = Exp.variable('x'),
+            set = Exp.set(x, one),
+            initEnv = Env.empty();
+          const newState = State.run(Cont.eval(evaluator(set)))(initEnv),
+           newEnv = pair.right(newState); 
+          Maybe.match(Env.lookup('x')(initEnv),{
+            nothing: (_) => {
+              expect(true).to.eql(true);
+              Maybe.match(Env.lookup('x')(newEnv),{
+                nothing: (_) => {
+                  expect().fail();
+                  done(); 
+                },
+                just: (value) => {
+                  expect(value).to.eql(1);
+                  done(); 
+                }
+              })
+            },
+            just: (value) => {
+              expect().fail();
               done(); 
             }
           })
