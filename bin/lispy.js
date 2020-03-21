@@ -64,48 +64,54 @@ const Evaluator = (syntax, definition) => (line) => {
 // evaluate:: String -> Cont[State[Maybe[VALUE]]]
 const evaluator = Evaluator(Syntax.expression, Semantics.definition);
 
-// repl:: () => State[Cont[IO]]
+/* 
+ * 環境 Environment
+ */
+const environment = Lispy.Env.prelude();
+
+// repl:: () => Cont[IO]
 const Repl = () => {
   return State.state(env => {
     return Cont.callCC(exit => {
 
       // loop:: () -> State[IO]
-      const loop = () => {
+      const loop = (environment) => {
         return IO.flatMap(read("\nlispy> "))(inputString  => {
           return IO.flatMap(IO.putString(inputString))(_ => {
             if(inputString === 'exit') {
-              return exit(IO.done(_));
+              return exit(Cont.unit(IO.done(_)));
+              // return exit(IO.done(_));
             } else {
               // const newState = Cont.eval(evaluator(inputString)).run(env),
-              const newState = State.run(Cont.eval(evaluator(inputString)))(env),
+              const newState = State.run(Cont.eval(evaluator(inputString)))(environment),
                 maybeValue = pair.left(newState),
                 newEnv = pair.right(newState);
 
               return Maybe.match(maybeValue,{
                 nothing: (message) => {
                   return IO.flatMap(IO.putString(`\nnothing: ${message}`))(_ => {
-                    return loop(newState); 
+                    return loop(environment); 
                   });
                 },
                 just: (value) => {
                   return IO.flatMap(IO.putString(`\n${value}`))(_ => {
-                    return loop(newState); 
+                    return loop(newEnv); 
                   });
                 }
               })
             }
           });
         });
-      }; // end of loop
-      return Cont.unit(loop())
-    }); // end of Cont.callCC
-  });
+      };// end of loop
+      return loop(env)
+    });  // end of Cont.callCC
+    // return State.run(loop())(environment)
+    //return Cont.unit(loop())
+  }); // end of Cont.callCC
 };
 
-/* 
- * 環境 Environment
- */
-const environment = Lispy.Env.prelude();
-
-IO.run(Cont.eval(Repl().run(environment)))
+IO.run(State.run(Repl())(environment));
+// IO.run(Cont.eval(Repl()));
+//IO.run(State.run(Repl()(environment)));
+// IO.run(Cont.eval(Repl().run(environment)))
 
