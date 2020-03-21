@@ -64,25 +64,18 @@ const Evaluator = (syntax, definition) => (line) => {
 // evaluate:: String -> Cont[State[Maybe[VALUE]]]
 const evaluator = Evaluator(Syntax.expression, Semantics.definition);
 
-/* 
- * 環境 Environment
- */
-const environment = Lispy.Env.prelude();
-
-// repl:: () => Cont[IO]
+// repl:: () => State[Cont[IO]]
 const Repl = () => {
   return State.state(env => {
     return Cont.callCC(exit => {
 
-      // loop:: () -> State[IO]
+      // loop:: (Env) -> IO
       const loop = (environment) => {
         return IO.flatMap(read("\nlispy> "))(inputString  => {
           return IO.flatMap(IO.putString(inputString))(_ => {
             if(inputString === 'exit') {
-              return exit(Cont.unit(IO.done(_)));
-              // return exit(IO.done(_));
+              return exit(IO.done());
             } else {
-              // const newState = Cont.eval(evaluator(inputString)).run(env),
               const newState = State.run(Cont.eval(evaluator(inputString)))(environment),
                 maybeValue = pair.left(newState),
                 newEnv = pair.right(newState);
@@ -105,13 +98,12 @@ const Repl = () => {
       };// end of loop
       return loop(env)
     });  // end of Cont.callCC
-    // return State.run(loop())(environment)
-    //return Cont.unit(loop())
-  }); // end of Cont.callCC
+  });  // end of State.state
 };
 
-IO.run(State.run(Repl())(environment));
-// IO.run(Cont.eval(Repl()));
-//IO.run(State.run(Repl()(environment)));
-// IO.run(Cont.eval(Repl().run(environment)))
+/* 環境 Environment */
+const environment = Lispy.Env.prelude();
+
+IO.run(Cont.eval(State.run(Repl())(environment)));
+// IO.run(Cont.eval(Repl().run(environment)));
 
