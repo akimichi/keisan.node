@@ -54,15 +54,24 @@ const Lispy = require("../lib/lispy"),
   Semantics = Lispy.Semantics,
   Syntax = Lispy.Syntax;
 
-// Evaluator:: (Syntax, Definition) => String => Cont[State[Maybe[VALUE]]]
-const Evaluator = (syntax, definition) => (line) => {
+// Interpreter:: Syntax => Definition => String => Cont[State[Maybe[VALUE]]]
+const Interpreter = (syntax) => (definition) => (line) => {
   return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
     const exp = result.value;
     return Semantics.evaluate(definition)(exp) // => Cont[State[Maybe[VALUE]]]
   });
 };
+
+const LispyInterpreter = Interpreter(Syntax.expression)(Semantics.definition);
+
+// const Evaluator = (syntax, definition) => (line) => {
+//   return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
+//     const exp = result.value;
+//     return Semantics.evaluate(definition)(exp) // => Cont[State[Maybe[VALUE]]]
+//   });
+// };
 // evaluate:: String -> Cont[State[Maybe[VALUE]]]
-const evaluator = Evaluator(Syntax.expression, Semantics.definition);
+//const evaluator = Evaluator(Syntax.expression, Semantics.definition);
 
 // repl:: () => State[Cont[IO]]
 const Repl = () => {
@@ -76,7 +85,7 @@ const Repl = () => {
             if(inputString === 'exit') {
               return exit(IO.done());
             } else {
-              const newState = State.run(Cont.eval(evaluator(inputString)))(environment),
+              const newState = State.run(Cont.eval(LispyInterpreter(inputString)))(environment),
                 maybeValue = pair.left(newState),
                 newEnv = pair.right(newState);
 
