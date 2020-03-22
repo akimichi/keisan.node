@@ -24,56 +24,33 @@ const Hyouka = require('hyouka.js'),
   IO = Monad.IO,
   ID = Monad.ID;
 
-// const Lispy = require('../lib/lispy'),
-//   Syntax = Lispy.Syntax;
-
-/*
- * 評価器
- */
-
-// const Interpreter = Hyouka.Interpreter,
-//   Semantics = Hyouka.Semantics;
-
-// const Evaluator = (syntax, evaluator) => {
-//   return (env) => (line) => { // Cont[Maybe[Value]]
-//     return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
-//       const exp = result.value;
-//       return evaluator(exp)(env); // Cont[Maybe[Value]]
-//     })
-//   }
-// };
 
 //
 const read = (prompt) => {
   const readlineSync = require('readline-sync');
   return IO.unit(readlineSync.question(prompt));
 };
-//
-// const Evaluator = Interpreter(Lispy.Syntax.expression, Semantics.evaluator);
+
+/* 評価器 */
 const Lispy = require("../lib/lispy"),
+  Interpreter = Lispy.Interpreter,
   Semantics = Lispy.Semantics,
   Syntax = Lispy.Syntax;
 
-// Interpreter:: Syntax => Definition => String => Cont[State[Maybe[VALUE]]]
-const Interpreter = (syntax) => (definition) => (line) => {
-  return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
-    const exp = result.value;
-    return Semantics.evaluate(definition)(exp) // => Cont[State[Maybe[VALUE]]]
-  });
-};
-
+// LispyInterpreter:: String -> Cont[State[Maybe[VALUE]]]
 const LispyInterpreter = Interpreter(Syntax.expression)(Semantics.definition);
+//const LispyInterpreter = Interpreter(Syntax.expression)(Semantics.definition);
 
-// const Evaluator = (syntax, definition) => (line) => {
+// Interpreter:: Syntax => Definition => String => Cont[State[Maybe[VALUE]]]
+// const Interpreter = (syntax) => (definition) => (line) => {
 //   return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
 //     const exp = result.value;
 //     return Semantics.evaluate(definition)(exp) // => Cont[State[Maybe[VALUE]]]
 //   });
 // };
-// evaluate:: String -> Cont[State[Maybe[VALUE]]]
-//const evaluator = Evaluator(Syntax.expression, Semantics.definition);
 
-// repl:: () => State[Cont[IO]]
+
+// Repl:: () => State[Cont[IO]]
 const Repl = () => {
   return State.state(env => {
     return Cont.callCC(exit => {
