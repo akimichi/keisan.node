@@ -39,16 +39,6 @@ const Lispy = require("../lib/lispy"),
 
 // LispyInterpreter:: String -> Cont[State[Maybe[VALUE]]]
 const LispyInterpreter = Interpreter(Syntax.expression)(Semantics.definition);
-//const LispyInterpreter = Interpreter(Syntax.expression)(Semantics.definition);
-
-// Interpreter:: Syntax => Definition => String => Cont[State[Maybe[VALUE]]]
-// const Interpreter = (syntax) => (definition) => (line) => {
-//   return Maybe.flatMap(Parser.parse(syntax())(line))(result =>  {
-//     const exp = result.value;
-//     return Semantics.evaluate(definition)(exp) // => Cont[State[Maybe[VALUE]]]
-//   });
-// };
-
 
 // Repl:: () => State[Cont[IO]]
 const Repl = () => {
