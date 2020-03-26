@@ -233,7 +233,7 @@ describe("Lispyをテストする",() => {
               })
             },
             nothing: (message) => {
-              expect(true).to.eql(true)
+              expect().to.fail()
               done();
             }
           });
@@ -249,7 +249,7 @@ describe("Lispyをテストする",() => {
               })
             },
             nothing: (message) => {
-              expect(true).to.eql(true)
+              expect().to.fail()
               done();
             }
           });
@@ -265,42 +265,133 @@ describe("Lispyをテストする",() => {
               })
             },
             nothing: (message) => {
-              expect(true).to.eql(true)
+              expect().to.fail()
               done();
             }
           });
         })
       })
+      describe("複数引数のappの場合",() => {
+        it("(add 1 2) はapp式である", function(done) {
+          Maybe.match(Syntax.app()("(add 1 2)"), {
+            just: (result) => {
+              Exp.match(result.value, {
+                app: (value) => {
+                  expect(true).to.eql(true)
+                  done();
+                }
+              })
+            },
+            nothing: (message) => {
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+        it("(add 1 (add 2 3)) はapp式である", function(done) {
+          Maybe.match(Syntax.app()("(add 1 (add 2 3))"), {
+            just: (result) => {
+              Exp.match(result.value, {
+                app: (value) => {
+                  expect(true).to.eql(true)
+                  done();
+                }
+              })
+            },
+            nothing: (message) => {
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+        it("(add (add 2 3) 1) はapp式である", function(done) {
+          Maybe.match(Syntax.app()("(add (add 2 3) 1)"), {
+            just: (result) => {
+              Exp.match(result.value, {
+                app: (value) => {
+                  expect(true).to.eql(true)
+                  done();
+                }
+              })
+            },
+            nothing: (message) => {
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+        it("(add (add 1 2) (add 3 4)) はapp式である", function(done) {
+          Maybe.match(Syntax.app()("(add (add 1 2) (add 3 4))"), {
+            just: (result) => {
+              console.log(result)
+              Exp.match(result.value, {
+                app: (value) => {
+                  expect(true).to.eql(true)
+                  done();
+                }
+              })
+            },
+            nothing: (message) => {
+              console.log(message)
+              expect().to.fail()
+              done();
+            }
+          });
+        })
+      });
     });
-    describe("複数引数のappの場合",() => {
-      it("(add 1 2) はapp式である", function(done) {
-        Maybe.match(Syntax.app()("(add 1 2)"), {
+    describe("setをテストする",() => {
+      it("{set x 1}はset式である", function(done) {
+        Maybe.match(Syntax.set()("{set x 1}"), {
           just: (result) => {
             Exp.match(result.value, {
-              app: (value) => {
+              set: (value) => {
                 expect(true).to.eql(true)
                 done();
               }
             })
           },
           nothing: (message) => {
-            expect(true).to.eql(true)
+            console.log(message)
+            expect().to.fail()
             done();
           }
         });
       })
-      it("(add 1 (add 2 3)) はapp式である", function(done) {
-        Maybe.match(Syntax.app()("(add 1 (add 2 3))"), {
+    });
+    describe("lambdaをテストする",() => {
+      it("{x x}はlambda式である", function(done) {
+        Maybe.match(Syntax.lambda()("{x x}"), {
           just: (result) => {
             Exp.match(result.value, {
-              app: (value) => {
+              lambda: (value) => {
                 expect(true).to.eql(true)
                 done();
               }
             })
           },
           nothing: (message) => {
-            expect(true).to.eql(true)
+            console.log(message)
+            expect().to.fail()
+            done();
+          }
+        });
+      })
+    });
+    describe("ifをテストする",() => {
+      it("{if #t 1 2}はif式である", function(done) {
+        Maybe.match(Syntax.if()("{if #t 1 2}"), {
+          just: (result) => {
+            Exp.match(result.value, {
+              condition: (value) => {
+                expect(true).to.eql(true)
+                done();
+              }
+            })
+          },
+          nothing: (message) => {
+            console.log(message)
+            expect().to.fail()
             done();
           }
         });
