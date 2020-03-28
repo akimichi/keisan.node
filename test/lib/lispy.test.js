@@ -42,6 +42,34 @@ describe("Lispyをテストする",() => {
         });
       })
       describe("演算を評価する evaluate operator expression",() => {
+        describe("equal式を評価する evaluate equal expression",() => {
+          it("evaluator(Exp.equal(2,1)) => false", function(done) {
+            const eq = Exp.equal(two, one); 
+            Maybe.match(State.eval(Cont.eval(evaluator(eq)))(emptyEnv), {
+              just: (result) => {
+                expect(result).to.eql(false)
+                done();
+              },
+              nothing: (message) => {
+                expect().to.fail()
+                done();
+              }
+            });
+          })
+          it("evaluator(Exp.equal(1,1)) => true", function(done) {
+            const eq = Exp.equal(one, one); 
+            Maybe.match(State.eval(Cont.eval(evaluator(eq)))(emptyEnv), {
+              just: (result) => {
+                expect(result).to.eql(true)
+                done();
+              },
+              nothing: (message) => {
+                expect().to.fail()
+                done();
+              }
+            });
+          })
+        })
         describe("greaterを評価する evaluate greater expression",() => {
           it("evaluator(Exp.greater(2,1)) => true", function(done) {
             const greater = Exp.greater(two, one); 
