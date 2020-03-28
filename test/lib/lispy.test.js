@@ -24,12 +24,13 @@ const Hyouka = require('hyouka.js'),
 describe("Lispyをテストする",() => {
   describe("Lispy.Semanticsをテストする",() => {
     const Semantics = require("../../lib/lispy").Semantics;
-
+    const one = Exp.num(1), two = Exp.num(2),x = Exp.variable('x'),y = Exp.variable('y'),
+      emptyEnv = Env.empty();
     describe("evaluatorをテストする",() => {
       const evaluator = Semantics.evaluate(Semantics.definition);
       it("evaluator(Exp.num)", function(done) {
         const number = Exp.num(2); 
-        Maybe.match(State.eval(Cont.eval(evaluator(number)))(Env.empty()), {
+        Maybe.match(State.eval(Cont.eval(evaluator(number)))(emptyEnv), {
           just: (result) => {
             expect(result).to.eql(2)
             done();
@@ -43,7 +44,7 @@ describe("Lispyをテストする",() => {
       describe("真理値を評価する evaluate bool expression",() => {
         it("evaluator(Exp.bool)", function(done) {
           const bool = Exp.bool(true); 
-          Maybe.match(State.eval(Cont.eval(evaluator(bool)))(Env.empty()), {
+          Maybe.match(State.eval(Cont.eval(evaluator(bool)))(emptyEnv), {
             just: (result) => {
               expect(result).to.eql(true)
               done();
@@ -58,7 +59,7 @@ describe("Lispyをテストする",() => {
       describe("リストを評価する evaluator list expression",() => {
         it("evaluator(Exp.list)", function(done) {
           const list = Exp.list([Exp.num(1), Exp.num(2)]); 
-          Maybe.match(State.eval(Cont.eval(evaluator(list)))(Env.empty()), {
+          Maybe.match(State.eval(Cont.eval(evaluator(list)))(emptyEnv), {
             just: (result) => {
               expect(result).to.eql([1,2])
               done();
@@ -73,7 +74,7 @@ describe("Lispyをテストする",() => {
       describe("変数を評価する evaluate variable expression",() => {
         it("evaluator(Exp.variable) で未定義の場合", function(done) {
           const variable = Exp.variable("foo"); 
-          Maybe.match(State.eval(Cont.eval(evaluator(variable)))(Env.empty()), {
+          Maybe.match(State.eval(Cont.eval(evaluator(variable)))(emptyEnv), {
             just: (result) => {
               expect().to.fail()
               done();
@@ -86,7 +87,7 @@ describe("Lispyをテストする",() => {
         })
         it("evaluator(Exp.variable) で定義済みの場合", function(done) {
           const variable = Exp.variable("bar"); 
-          const env = Env.extend("bar", 1)(Env.empty());
+          const env = Env.extend("bar", 1)(emptyEnv);
           Maybe.match(State.eval(Cont.eval(evaluator(variable)))(env), {
             just: (result) => {
               expect(result).to.eql(1)
@@ -106,7 +107,7 @@ describe("Lispyをテストする",() => {
             Exp.lambda(x, Exp.add(x, one)),
             one);
 
-          Maybe.match(State.eval(Cont.eval(evaluator(application)))(Env.empty()),{
+          Maybe.match(State.eval(Cont.eval(evaluator(application)))(emptyEnv),{
             nothing: (_) => {
               expect().fail();
             },
@@ -117,6 +118,7 @@ describe("Lispyをテストする",() => {
           })
         });
         it("app(app(lambda(x, lambda(y, subtract(x,y))), two), one)",(done) => {
+          // (({x {y (- x y)}} 2) 1)
           const one = Exp.num(1), two = Exp.num(2);
           const x = Exp.variable('x'), y = Exp.variable('y'),
             application = Exp.app(
@@ -124,7 +126,7 @@ describe("Lispyをテストする",() => {
                 Exp.lambda(x, Exp.lambda(y, 
                   Exp.subtract(x, y)))
                 , two) , one);
-          Maybe.match(State.eval(Cont.eval(evaluator(application)))(Env.empty()),{
+          Maybe.match(State.eval(Cont.eval(evaluator(application)))(emptyEnv),{
             nothing: (_) => {
               expect().fail();
             },
@@ -151,7 +153,7 @@ describe("Lispyをテストする",() => {
               return pair.cons(Semantics.binary(operator)(expL, expR)(env), env);
             });
           },
-          Maybe.match(State.eval(Cont.eval(evaluator(application)))(Env.empty()),{
+          Maybe.match(State.eval(Cont.eval(evaluator(application)))(emptyEnv),{
             nothing: (_) => {
               expect().fail();
             },
@@ -164,9 +166,8 @@ describe("Lispyをテストする",() => {
       })
       describe("setを評価する evaluator special function 'set'",() => {
         it("set(x, Exp.num(1)) で値を確認する",(done) => {
-          const one = Exp.num(1), x = Exp.variable('x'),
-            set = Exp.set(x, one);
-          Maybe.match(State.eval(Cont.eval(evaluator(set)))(Env.empty()),{
+          const set = Exp.set(x, one);
+          Maybe.match(State.eval(Cont.eval(evaluator(set)))(emptyEnv),{
             nothing: (_) => {
               expect().fail();
             },
@@ -177,12 +178,10 @@ describe("Lispyをテストする",() => {
           })
         });
         it("set(x, Exp.num(1)) で状態を確認する",(done) => {
-          const one = Exp.num(1), x = Exp.variable('x'),
-            set = Exp.set(x, one),
-            initEnv = Env.empty();
-          const newState = State.run(Cont.eval(evaluator(set)))(initEnv),
+          const set = Exp.set(x, one);
+          const newState = State.run(Cont.eval(evaluator(set)))(emptyEnv),
            newEnv = pair.right(newState); 
-          Maybe.match(Env.lookup('x')(initEnv),{
+          Maybe.match(Env.lookup('x')(emptyEnv),{
             nothing: (_) => {
               expect(true).to.eql(true);
               Maybe.match(Env.lookup('x')(newEnv),{
@@ -203,7 +202,23 @@ describe("Lispyをテストする",() => {
           })
         });
       })
-    });
+      describe("ifを評価する evaluator special function 'condition'",() => {
+
+        // it("if(true, Exp.num(1), Exp.num(2)) => 2",(done) => {
+        //   const condition = Exp.condition(Exp.bool(true), one, two);
+        //   Maybe.match(State.eval(Cont.eval(evaluator(set)))(initEnv),{
+        //     nothing: (_) => {
+        //       expect().fail();
+        //     },
+        //     just: (value) => {
+        //       expect(value).to.eql(1);
+        //       done(); 
+        //     }
+        //   })
+        // });
+
+      })
+    })
   });
   describe("Lispy.Syntaxをテストする",() => {
     const Syntax = require("../../lib/lispy").Syntax;
