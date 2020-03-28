@@ -41,6 +41,66 @@ describe("Lispyをテストする",() => {
           }
         });
       })
+      describe("演算を評価する evaluate operator expression",() => {
+        describe("greaterを評価する evaluate greater expression",() => {
+          it("evaluator(Exp.greater(2,1)) => true", function(done) {
+            const greater = Exp.greater(two, one); 
+            Maybe.match(State.eval(Cont.eval(evaluator(greater)))(emptyEnv), {
+              just: (result) => {
+                expect(result).to.eql(true)
+                done();
+              },
+              nothing: (message) => {
+                expect().to.fail()
+                done();
+              }
+            });
+          })
+          it("evaluator(Exp.greater(1,2)) => true", function(done) {
+            const greater = Exp.greater(one, two); 
+            Maybe.match(State.eval(Cont.eval(evaluator(greater)))(emptyEnv), {
+              just: (result) => {
+                expect(result).to.eql(false)
+                done();
+              },
+              nothing: (message) => {
+                expect().to.fail()
+                done();
+              }
+            });
+          })
+        })
+        describe("addを評価する evaluate add expression",() => {
+          it("evaluator(Exp.add(1,2)) => 3", function(done) {
+            const add = Exp.add(one, two); 
+            Maybe.match(State.eval(Cont.eval(evaluator(add)))(emptyEnv), {
+              just: (result) => {
+                expect(result).to.eql(3)
+                done();
+              },
+              nothing: (message) => {
+                expect().to.fail()
+                done();
+              }
+            });
+          })
+        })
+        describe("subtractを評価する evaluate subtract expression",() => {
+          it("evaluator(Exp.add(2,1)) => 1", function(done) {
+            const subtract = Exp.subtract(two, one); 
+            Maybe.match(State.eval(Cont.eval(evaluator(subtract)))(emptyEnv), {
+              just: (result) => {
+                expect(result).to.eql(1)
+                done();
+              },
+              nothing: (message) => {
+                expect().to.fail()
+                done();
+              }
+            });
+          })
+        })
+      })
       describe("真理値を評価する evaluate bool expression",() => {
         it("evaluator(Exp.bool)", function(done) {
           const bool = Exp.bool(true); 
