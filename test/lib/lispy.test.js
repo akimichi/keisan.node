@@ -203,19 +203,30 @@ describe("Lispyをテストする",() => {
         });
       })
       describe("ifを評価する evaluator special function 'condition'",() => {
-
-        // it("if(true, Exp.num(1), Exp.num(2)) => 2",(done) => {
-        //   const condition = Exp.condition(Exp.bool(true), one, two);
-        //   Maybe.match(State.eval(Cont.eval(evaluator(set)))(initEnv),{
-        //     nothing: (_) => {
-        //       expect().fail();
-        //     },
-        //     just: (value) => {
-        //       expect(value).to.eql(1);
-        //       done(); 
-        //     }
-        //   })
-        // });
+        it("if(true, Exp.num(1), Exp.num(2)) => 2",(done) => {
+          const condition = Exp.condition(Exp.bool(true), one, two);
+          Maybe.match(State.eval(Cont.eval(evaluator(condition)))(emptyEnv),{
+            nothing: (_) => {
+              expect().fail();
+            },
+            just: (value) => {
+              expect(value).to.eql(1);
+              done(); 
+            }
+          })
+        });
+        it("if(false, Exp.num(1), Exp.num(2)) => 2",(done) => {
+          const condition = Exp.condition(Exp.bool(false), one, two);
+          Maybe.match(State.eval(Cont.eval(evaluator(condition)))(emptyEnv),{
+            nothing: (_) => {
+              expect().fail();
+            },
+            just: (value) => {
+              expect(value).to.eql(2);
+              done(); 
+            }
+          })
+        });
 
       })
     })
