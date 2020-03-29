@@ -188,6 +188,30 @@ describe("Lispyをテストする",() => {
           });
         })
       })
+      describe("複雑な式を評価する evaluator complex expression",() => {
+        const x = Exp.variable('x'), y = Exp.variable('y'), n = Exp.variable('n'), 
+          zero = Exp.num(0), one = Exp.num(1);
+        describe("lambdaをifの複合を評価する",() => {
+          it("((\\n -> if (n == 1) 1 0) 1) => 1",(done) => {
+            const expression = Exp.app(
+              Exp.lambda(
+                n, 
+                Exp.condition(Exp.equal(n, one), one, zero) 
+              ),
+              one);
+
+            Maybe.match(State.eval(Cont.eval(evaluator(expression)))(emptyEnv),{
+              nothing: (_) => {
+                expect().fail();
+              },
+              just: (value) => {
+                expect(value).to.eql(1);
+                done(); 
+              }
+            })
+          });
+        });
+      })
       describe("関数適用を評価する evaluator function application",() => {
         it("(x => (x + 1))(1)",(done) => {
           const x = Exp.variable('x'), one = Exp.num(1);
@@ -291,7 +315,7 @@ describe("Lispyをテストする",() => {
         });
       })
       describe("ifを評価する evaluator special function 'condition'",() => {
-        it("if(true, Exp.num(1), Exp.num(2)) => 2",(done) => {
+        it("if(true, Exp.num(1), Exp.num(2)) => 1",(done) => {
           const condition = Exp.condition(Exp.bool(true), one, two);
           Maybe.match(State.eval(Cont.eval(evaluator(condition)))(emptyEnv),{
             nothing: (_) => {
