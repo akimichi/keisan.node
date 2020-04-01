@@ -22,6 +22,121 @@ const Hyouka = require('hyouka.js'),
 
 // ### Lispyのテスト
 describe("Lispyをテストする",() => {
+  describe("Interpreterをテストする",() => {
+    const Lispy = require("../../lib/lispy"),
+      Interpreter = Lispy.Interpreter,
+      Semantics = Lispy.Semantics,
+      Syntax = Lispy.Syntax;
+    // LispyInterpreter:: String -> Cont[State[Maybe[VALUE]]]
+    const LispyInterpreter = Interpreter(Syntax.expression)(Semantics.definition);
+    const emptyEnv = Env.empty();
+
+    describe("単純な値の評価をテストする",() => {
+      it("#t => true", function(done) {
+        const newState = State.run(Cont.eval(LispyInterpreter("#t")))(emptyEnv),
+          maybeValue = pair.left(newState),
+          newEnv = pair.right(newState);
+
+        Maybe.match(maybeValue, {
+          just: (result) => {
+            expect(result).to.eql(true)
+            done();
+          },
+          nothing: (message) => {
+            expect().to.fail()
+            done();
+          }
+        });
+      })
+    });
+    describe("特殊形式をテストする",() => {
+      const zero = Exp.num(0), one = Exp.num(1);
+      it("{set x 0}", function(done) {
+        const newState = State.run(Cont.eval(LispyInterpreter("{set x 0}")))(emptyEnv),
+          newEnv = pair.right(newState);
+
+        Maybe.match(Env.lookup('x')(newEnv),{
+          nothing: (_) => {
+            expect().fail();
+            done();
+          },
+          just: (value) => {
+            expect(value).to.eql(0);
+            done(); 
+          }
+        })
+      })
+      it("{if #t 1 0}", function(done) {
+        const newState = State.run(Cont.eval(LispyInterpreter("{if #t 1 0}")))(emptyEnv),
+          maybeValue = pair.left(newState);
+        Maybe.match(maybeValue, {
+          just: (result) => {
+            expect(result).to.eql(1)
+            done();
+          },
+          nothing: (message) => {
+            expect().to.fail()
+            done();
+          }
+        });
+      })
+      it("{if #f 0 1}", function(done) {
+        const newState = State.run(Cont.eval(LispyInterpreter("{if #f 0 1}")))(emptyEnv),
+          maybeValue = pair.left(newState);
+        Maybe.match(maybeValue, {
+          just: (result) => {
+            expect(result).to.eql(1)
+            done();
+          },
+          nothing: (message) => {
+            expect().to.fail()
+            done();
+          }
+        });
+      })
+      describe("再帰関数をテストする",() => {
+        // (defun fact (n)
+        //   (if (<= n 1)
+        //       1
+        //       (* n (fact (1- n)))))
+        const initEnv = Lispy.Env.prelude();
+
+        it("{set fact {n {if (< n 2) 1 (* (fact (- n 1)))}}}は、functionを含んだ環境を返す", function(done) {
+          const newState = State.run(Cont.eval(LispyInterpreter("{set fact {n {if (< n 2) 1 (* (fact (- n 1)))}}}")))(initEnv),
+            newEnv = pair.right(newState);
+          Maybe.match(Env.lookup('fact')(newEnv),{
+            nothing: (_) => {
+              expect().fail();
+              done();
+            },
+            just: (value) => {
+              expect(value).to.be.a("function");
+              done(); 
+            }
+          });
+        });
+      });
+    });
+    describe("関数適用の評価をテストする",() => {
+      const zero = Exp.num(0), one = Exp.num(1);
+      it("({x x} 0)", function(done) {
+        const newState = State.run(Cont.eval(LispyInterpreter("({x x} 0)")))(emptyEnv),
+          maybeValue = pair.left(newState),
+          newEnv = pair.right(newState);
+
+        Maybe.match(maybeValue, {
+          just: (result) => {
+            expect(result).to.eql(0)
+            done();
+          },
+          nothing: (message) => {
+            expect().to.fail()
+            done();
+          }
+        });
+      })
+    });
+  });
   describe("Lispy.Semanticsをテストする",() => {
     const Semantics = require("../../lib/lispy").Semantics;
     const one = Exp.num(1), two = Exp.num(2),x = Exp.variable('x'),y = Exp.variable('y'),
@@ -351,7 +466,6 @@ describe("Lispyをテストする",() => {
         it("(succ 1 は parse error", function(done) {
           Maybe.match(Syntax.app()("(succ 1"), {
             just: (result) => {
-              console.log(message)
               expect().to.fail()
             },
             nothing: (message) => {
@@ -461,7 +575,6 @@ describe("Lispyをテストする",() => {
         it("(add (add 1 2) (add 3 4)) はapp式である", function(done) {
           Maybe.match(Syntax.app()("(add (add 1 2) (add 3 4))"), {
             just: (result) => {
-              console.log(result)
               Exp.match(result.value, {
                 app: (value) => {
                   expect(true).to.eql(true)
