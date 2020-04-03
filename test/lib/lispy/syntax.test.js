@@ -38,11 +38,13 @@ describe("Lispy.Syntaxをテストする",() => {
         });
       })
       it("(succ 1) はapp式である", function(done) {
+        //this.timeout("5s")
         Maybe.match(Syntax.app()("(succ 1)"), {
           just: (result) => {
             Exp.match(result.value, {
-              app: (value) => {
-                expect(true).to.eql(true)
+              app: (operator, operand) => {
+                expect(operator.type).to.eql("variable")
+                expect(operand.type).to.eql("num")
                 done();
               }
             })
@@ -57,8 +59,9 @@ describe("Lispy.Syntaxをテストする",() => {
         Maybe.match(Syntax.app()("(succ (succ 1))"), {
           just: (result) => {
             Exp.match(result.value, {
-              app: (value) => {
-                expect(true).to.eql(true)
+              app: (operator, operand) => {
+                expect(operator.type).to.eql("variable")
+                expect(operand.type).to.eql("app")
                 done();
               }
             })
@@ -161,6 +164,26 @@ describe("Lispy.Syntaxをテストする",() => {
           Exp.match(result.value, {
             set: (value) => {
               expect(true).to.eql(true)
+              done();
+            }
+          })
+        },
+        nothing: (message) => {
+          console.log(message)
+          expect().to.fail()
+          done();
+        }
+      });
+    })
+    it("{set fact {n {if (< n 2) 1 (* n (fact (- n 1)))}}}はset式である", function(done) {
+      this.timeout("5s")
+      Maybe.match(Syntax.set()("{set fact {n {if (< n 2) 1 (* n (fact (- n 1)))}}}"), {
+        just: (result) => {
+          Exp.match(result.value, {
+            set: (variable, body) => {
+              expect(variable.type).to.eql("variable")
+              expect(body.type).to.eql("lambda")
+              // const condition = body.value.body
               done();
             }
           })
