@@ -179,11 +179,15 @@ describe("Lispy.Syntaxをテストする",() => {
       this.timeout("5s")
       Maybe.match(Syntax.set()("{set fact {n {if (< n 2) 1 (* n (fact (- n 1)))}}}"), {
         just: (result) => {
+          expect(result.value.type).to.eql("set")
+          console.log(result.value)
           Exp.match(result.value, {
             set: (variable, body) => {
               expect(variable.type).to.eql("variable")
+              expect(variable.type.content).to.eql("variable")
               expect(body.type).to.eql("lambda")
               // const condition = body.value.body
+              //body.content
               done();
             }
           })
